@@ -516,9 +516,7 @@ class ProviderRegistry:
         available.append("tesseract")
         return self._filter_by_capability(available, "ocr")
 
-    def _filter_by_capability(
-        self, providers: List[str], capability: str
-    ) -> List[str]:
+    def _filter_by_capability(self, providers: List[str], capability: str) -> List[str]:
         return [
             provider
             for provider in providers
