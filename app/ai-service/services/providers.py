@@ -23,7 +23,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import httpx
 
-from config import settings
+from config import DEFAULT_PROVIDER_CAPABILITY_MATRIX, settings
 from exceptions import AIServiceError
 
 logger = logging.getLogger(__name__)
@@ -33,6 +33,7 @@ logger = logging.getLogger(__name__)
 # the registry and the configuration validator share a single source of truth.
 KNOWN_LLM_PROVIDERS = frozenset({"openai", "groq", "test"})
 KNOWN_OCR_PROVIDERS = frozenset({"test", "tesseract"})
+KNOWN_CAPABILITIES = frozenset({"llm", "ocr"})
 
 
 def validate_fallback_order(setting_name: str, order: "List[str]") -> None:
@@ -56,6 +57,27 @@ def validate_fallback_order(setting_name: str, order: "List[str]") -> None:
         if name in seen:
             raise ValueError(f"lists provider {name!r} more than once")
         seen.add(name)
+
+
+def validate_provider_capability_matrix(matrix: Dict[str, List[str]]) -> None:
+    """Validate provider names and capability identifiers in the capability map."""
+    known_providers = KNOWN_LLM_PROVIDERS | KNOWN_OCR_PROVIDERS
+    for provider, capabilities in matrix.items():
+        if provider not in known_providers:
+            raise ValueError(f"references unknown provider {provider!r}")
+        seen: set[str] = set()
+        for capability in capabilities:
+            if capability not in KNOWN_CAPABILITIES:
+                raise ValueError(
+                    f"provider {provider!r} references unknown capability "
+                    f"{capability!r}"
+                )
+            if capability in seen:
+                raise ValueError(
+                    f"provider {provider!r} lists capability {capability!r} "
+                    "more than once"
+                )
+            seen.add(capability)
 
 
 # ---------------------------------------------------------------------------
@@ -453,6 +475,10 @@ class ProviderRegistry:
 
     def __init__(self) -> None:
         self._providers: Dict[str, ModelProvider] = {}
+        self._capability_matrix = {
+            provider: frozenset(capabilities)
+            for provider, capabilities in settings.provider_capability_matrix.items()
+        }
         self._register_default_providers()
 
     def _register_default_providers(self) -> None:
@@ -479,7 +505,7 @@ class ProviderRegistry:
             available.append("openai")
         if settings.groq_api_key:
             available.append("groq")
-        return available
+        return self._filter_by_capability(available, "llm")
 
     def available_ocr_providers(self) -> List[str]:
         """Return ordered list of available OCR provider names."""
@@ -488,7 +514,16 @@ class ProviderRegistry:
             available.append("test")
         # Tesseract is always available locally
         available.append("tesseract")
-        return available
+        return self._filter_by_capability(available, "ocr")
+
+    def _filter_by_capability(
+        self, providers: List[str], capability: str
+    ) -> List[str]:
+        return [
+            provider
+            for provider in providers
+            if capability in self._capability_matrix.get(provider, frozenset())
+        ]
 
     def resolve_llm(self, preference: str = "auto") -> List[Tuple[str, ModelProvider]]:
         """Return (name, provider) pairs in attempt order for LLM chat.

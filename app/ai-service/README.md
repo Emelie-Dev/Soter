@@ -173,6 +173,20 @@ The `/ai/metrics` endpoint exposes `llm_provider_cost_ceiling_usd` and
 }
 ```
 
+### Provider Capabilities
+
+Provider eligibility is declared centrally by `PROVIDER_CAPABILITY_MATRIX`, a
+JSON object keyed by provider name. The supported capability identifiers are
+`llm` and `ocr`; a provider is considered for a request only if its matrix
+entry includes that request's capability and it is otherwise available
+(credentials or local runtime). Existing fallback-order settings still control
+the order among eligible providers. Removing a capability from an entry
+prevents that provider from being selected for the corresponding request type.
+
+```dotenv
+PROVIDER_CAPABILITY_MATRIX={"openai":["llm"],"groq":["llm"],"test":["llm","ocr"],"tesseract":["ocr"]}
+```
+
 ### PII Anonymization
 - **POST** `/ai/anonymize` - Privacy-preserving anonymization for names, locations, and dates before external LLM usage
 

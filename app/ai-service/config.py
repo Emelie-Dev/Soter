@@ -45,6 +45,13 @@ _RATE_LIMIT_PATTERN: re.Pattern[str] = re.compile(
 
 _REDIS_SCHEMES = ("redis://", "rediss://", "unix://")
 
+DEFAULT_PROVIDER_CAPABILITY_MATRIX = {
+    "openai": ["llm"],
+    "groq": ["llm"],
+    "test": ["llm", "ocr"],
+    "tesseract": ["ocr"],
+}
+
 
 class Settings(BaseSettings):
     """
@@ -169,6 +176,14 @@ class Settings(BaseSettings):
     # lowest-latency-first without editing source.
     llm_provider_fallback_order: str = "openai,groq,test"
     ocr_provider_fallback_order: str = "test,tesseract"
+    # Capabilities are selected from this map before applying fallback order.
+    # Override with PROVIDER_CAPABILITY_MATRIX as a JSON object.
+    provider_capability_matrix: Dict[str, List[str]] = Field(
+        default_factory=lambda: {
+            provider: capabilities.copy()
+            for provider, capabilities in DEFAULT_PROVIDER_CAPABILITY_MATRIX.items()
+        }
+    )
 
     # Load shedding settings
     load_shed_memory_threshold_percent: float = 90.0
@@ -503,6 +518,7 @@ class Settings(BaseSettings):
         # config). The known-provider sets live next to the registry so they
         # remain the single source of truth.
         from services.providers import validate_fallback_order
+        from services.providers import validate_provider_capability_matrix
 
         for key, order in (
             ("LLM_PROVIDER_FALLBACK_ORDER", self.get_llm_fallback_order()),
@@ -512,6 +528,11 @@ class Settings(BaseSettings):
                 validate_fallback_order(key, order)
             except ValueError as exc:
                 _add(key, str(exc))
+
+        try:
+            validate_provider_capability_matrix(self.provider_capability_matrix)
+        except ValueError as exc:
+            _add("PROVIDER_CAPABILITY_MATRIX", str(exc))
 
         for provider, ceiling in self.llm_provider_cost_ceilings.items():
             key = "LLM_PROVIDER_COST_CEILINGS"
