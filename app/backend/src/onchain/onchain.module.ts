@@ -27,6 +27,7 @@ import { SorobanEventCorrelationScheduler } from './soroban-event-correlation.sc
 import { SorobanCorrelationTraceService } from './soroban-correlation-trace.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { CommonServicesModule } from '../common/services/common-services.module';
+import { OnchainCircuitBreakerService } from './onchain-circuit-breaker.service';
 
 const skipBackgroundJobs = process.env.SKIP_BACKGROUND_JOBS === 'true';
 
@@ -35,6 +36,7 @@ const skipBackgroundJobs = process.env.SKIP_BACKGROUND_JOBS === 'true';
  */
 export const createOnchainAdapter = (
   configService: ConfigService,
+  circuitBreaker?: OnchainCircuitBreakerService,
 ): OnchainAdapter => {
   const adapterType =
     configService.get<string>('ONCHAIN_ADAPTER')?.toLowerCase() || 'mock';
@@ -42,8 +44,10 @@ export const createOnchainAdapter = (
   switch (adapterType) {
     case 'mock':
       return new MockOnchainAdapter();
-    case 'soroban':
-      return new SorobanAdapter(configService);
+    case 'soroban': {
+      const adapter = new SorobanAdapter(configService);
+      return circuitBreaker ? circuitBreaker.protect(adapter) : adapter;
+    }
     default:
       throw new Error(
         `Unknown ONCHAIN_ADAPTER: ${adapterType}. Supported values: mock, soroban`,
@@ -54,7 +58,7 @@ export const createOnchainAdapter = (
 const onchainAdapterProvider: Provider = {
   provide: ONCHAIN_ADAPTER_TOKEN,
   useFactory: createOnchainAdapter,
-  inject: [ConfigService],
+  inject: [ConfigService, OnchainCircuitBreakerService],
 };
 
 @Module({
@@ -106,6 +110,7 @@ const onchainAdapterProvider: Provider = {
     MockOnchainAdapter,
     SorobanAdapter,
     onchainAdapterProvider,
+    OnchainCircuitBreakerService,
     OnchainProcessor,
     OnchainService,
     StellarLedgerSource,
@@ -122,6 +127,7 @@ const onchainAdapterProvider: Provider = {
   ],
   exports: [
     ONCHAIN_ADAPTER_TOKEN,
+    OnchainCircuitBreakerService,
     OnchainService,
     StellarLedgerSource,
     LedgerBackfillService,

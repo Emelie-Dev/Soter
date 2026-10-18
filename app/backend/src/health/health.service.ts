@@ -12,6 +12,7 @@ import {
   ProviderHealthRegistryService,
   ProviderHealthSnapshot,
 } from './provider-health-registry.service';
+import { OnchainCircuitBreakerService } from '../onchain/onchain-circuit-breaker.service';
 
 export type CheckStatus = 'up' | 'down' | 'skipped';
 export type ReadinessStatus = 'ready' | 'degraded' | 'not_ready';
@@ -76,6 +77,7 @@ export class HealthService {
     @Inject(REDIS_CLIENT)
     private readonly redisClient: Redis,
     private readonly providerHealthRegistry: ProviderHealthRegistryService,
+    private readonly onchainCircuitBreaker: OnchainCircuitBreakerService,
   ) {}
 
   check() {
@@ -487,6 +489,7 @@ export class HealthService {
         `On-chain adapter health check timed out after ${timeoutMs}ms`,
       );
       const latencyMs = Date.now() - start;
+      const circuitBreaker = this.onchainCircuitBreaker.getSnapshot();
 
       return {
         status: 'up',
@@ -496,12 +499,14 @@ export class HealthService {
           connected: true,
           contractName: metadata.name,
           contractVersion: metadata.version,
+          circuitBreaker,
         },
       };
     } catch (error) {
       const latencyMs = Date.now() - start;
       const message =
         error instanceof Error ? error.message : 'Unknown on-chain error';
+      const circuitBreaker = this.onchainCircuitBreaker.getSnapshot();
 
       this.logger.warn(
         'On-chain adapter health check failed',
@@ -519,6 +524,7 @@ export class HealthService {
           adapter: adapterType,
           connected: false,
           error: message,
+          circuitBreaker,
         },
       };
     }
