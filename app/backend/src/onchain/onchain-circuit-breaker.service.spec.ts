@@ -64,7 +64,7 @@ describe('OnchainCircuitBreakerService', () => {
     await expect(breaker.execute(fail)).rejects.toThrow('RPC request failed');
     now += 500;
 
-    await expect(breaker.execute(async () => 'healthy')).resolves.toBe(
+    await expect(breaker.execute(() => 'healthy')).resolves.toBe(
       'healthy',
     );
     expect(breaker.getSnapshot()).toMatchObject({
