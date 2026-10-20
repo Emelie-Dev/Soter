@@ -13,6 +13,7 @@ import {
   ProviderHealthSnapshot,
 } from './provider-health-registry.service';
 import { NotificationProviderHealthService } from '../notifications/notification-provider-health.service';
+import { OnchainCircuitBreakerService } from '../onchain/onchain-circuit-breaker.service';
 
 export type CheckStatus = 'up' | 'down' | 'skipped';
 export type ReadinessStatus = 'ready' | 'degraded' | 'not_ready';
@@ -79,6 +80,7 @@ export class HealthService {
     private readonly redisClient: Redis,
     private readonly providerHealthRegistry: ProviderHealthRegistryService,
     private readonly notificationProviderHealth: NotificationProviderHealthService,
+    private readonly onchainCircuitBreaker: OnchainCircuitBreakerService,
   ) {}
 
   check() {

@@ -11,6 +11,7 @@ import { ONCHAIN_ADAPTER_TOKEN } from '../onchain/onchain.adapter';
 import { REDIS_CLIENT } from '../redis/redis.module';
 import { ProviderHealthRegistryService } from './provider-health-registry.service';
 import { NotificationProviderHealthService } from '../notifications/notification-provider-health.service';
+import { OnchainCircuitBreakerService } from '../onchain/onchain-circuit-breaker.service';
 
 describe('HealthController', () => {
   let app: INestApplication;
@@ -64,6 +65,19 @@ describe('HealthController', () => {
         { provide: PrismaService, useValue: prismaMock },
         { provide: LoggerService, useValue: loggerMock },
         { provide: ONCHAIN_ADAPTER_TOKEN, useValue: onchainAdapterMock },
+        {
+          provide: OnchainCircuitBreakerService,
+          useValue: {
+            getSnapshot: jest.fn().mockReturnValue({
+              state: 'closed',
+              failureCount: 0,
+              failureThreshold: 5,
+              failureWindowMs: 30000,
+              resetTimeoutMs: 30000,
+              retryAfterMs: 0,
+            }),
+          },
+        },
         { provide: REDIS_CLIENT, useValue: redisClientMock },
         {
           provide: ProviderHealthRegistryService,

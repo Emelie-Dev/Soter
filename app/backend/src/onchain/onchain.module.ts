@@ -4,6 +4,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { ScheduleModule } from '@nestjs/schedule';
 import { OnchainAdapter, ONCHAIN_ADAPTER_TOKEN } from './onchain.adapter';
 export { ONCHAIN_ADAPTER_TOKEN };
+import { OnchainCircuitBreakerService } from './onchain-circuit-breaker.service';
 import { MockOnchainAdapter } from './onchain.adapter.mock';
 import { SorobanAdapter } from './soroban.adapter';
 import { OnchainProcessor } from './onchain.processor';
