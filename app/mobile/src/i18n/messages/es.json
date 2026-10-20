@@ -29,7 +29,8 @@
     "languageNameEn": "Inglés",
     "languageNameEs": "Español",
     "languageNameFr": "Francés",
-    "done": "Hecho"
+    "done": "Hecho",
+    "continue": "Continuar"
   },
   "navigation": {
     "home": "Inicio",
@@ -86,7 +87,16 @@
     "disconnect": "Desconectar",
     "copyAddress": "Copiar Dirección",
     "addressCopied": "Dirección copiada al portapapeles",
-    "explorer": "Ver en Explorador"
+    "explorer": "Ver en Explorador",
+    "differentWalletDetected": "Se detectó una billetera diferente",
+    "differentWalletWarning": "Esta es una billetera distinta a la anterior. Antes conectaste {previousAddress}, pero esta sesión intenta conectar {newAddress}. Continúa solo si deseas cambiar de billetera.",
+    "sameWalletWarning": "Esta billetera coincide con la ya conectada a este dispositivo."
+  },
+  "network": {
+    "qualityDegradedBadge": "Lento",
+    "qualityDegradedTitle": "Conexión lenta",
+    "qualityDegradedMessage": "Las acciones pueden tardar más mientras la red se recupera.",
+    "qualityDegradedLabel": "Conexión lenta. La red está disponible pero responde con lentitud."
   },
   "settings": {
     "title": "Ajustes",
@@ -112,6 +122,7 @@
     "languageHint": "Elige el idioma utilizado en toda la app",
     "securityTitle": "Seguridad",
     "biometricLock": "Bloqueo biométrico",
+    "sharedDeviceMode": "Modo dispositivo compartido",
     "pushNotifications": "Notificaciones push",
     "autoDetect": "Detección automática",
     "aidCache": "Caché de ayuda",
@@ -286,7 +297,12 @@
     "contractId": "ID del contrato"
   },
   "forceUpgrade": {
-    "updateNow": "Actualizar ahora"
+    "updateNow": "Actualizar ahora",
+    "warningTitle": "Actualización requerida pronto",
+    "warningMessage": "Pronto se requerirá una actualización obligatoria. Complete y sincronice sus tareas actuales, luego actualice para continuar usando Soter.",
+    "gracePeriodCountdown": "Período de gracia restante: {time}",
+    "gracePeriodExpired": "El período de gracia ha expirado. Se requiere actualización para continuar.",
+    "dismiss": "Descartar"
   },
   "submissionQueue": {
     "retries": "Reintentos",

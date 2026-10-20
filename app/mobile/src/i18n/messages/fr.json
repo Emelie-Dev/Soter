@@ -29,7 +29,8 @@
     "languageNameEn": "Anglais",
     "languageNameEs": "Espagnol",
     "languageNameFr": "Français",
-    "done": "Terminé"
+    "done": "Terminé",
+    "continue": "Continuer"
   },
   "navigation": {
     "home": "Accueil",
@@ -86,7 +87,16 @@
     "disconnect": "Déconnecter",
     "copyAddress": "Copier l'adresse",
     "addressCopied": "Adresse copiée dans le presse-papiers",
-    "explorer": "Voir dans l'explorateur"
+    "explorer": "Voir dans l'explorateur",
+    "differentWalletDetected": "Portefeuille différent détecté",
+    "differentWalletWarning": "Ce portefeuille est différent de celui utilisé auparavant. Vous avez précédemment connecté {previousAddress}, mais cette session tente de se connecter à {newAddress}. Continuez uniquement si vous souhaitez changer de portefeuille.",
+    "sameWalletWarning": "Ce portefeuille correspond à celui déjà connecté à cet appareil."
+  },
+  "network": {
+    "qualityDegradedBadge": "Lent",
+    "qualityDegradedTitle": "Connexion lente",
+    "qualityDegradedMessage": "Les actions peuvent prendre plus de temps pendant la récupération du réseau.",
+    "qualityDegradedLabel": "Connexion lente. Le réseau est disponible mais répond lentement."
   },
   "settings": {
     "title": "Paramètres",
@@ -112,6 +122,7 @@
     "languageHint": "Choisissez la langue utilisée dans toute l'application",
     "securityTitle": "Sécurité",
     "biometricLock": "Verrouillage biométrique",
+    "sharedDeviceMode": "Mode appareil partagé",
     "pushNotifications": "Notifications push",
     "autoDetect": "Détection automatique",
     "aidCache": "Cache d'aide",
@@ -286,7 +297,12 @@
     "contractId": "ID du contrat"
   },
   "forceUpgrade": {
-    "updateNow": "Mettre à jour"
+    "updateNow": "Mettre à jour",
+    "warningTitle": "Mise à jour requise bientôt",
+    "warningMessage": "Une mise à jour obligatoire sera bientôt requise. Veuillez terminer et synchroniser vos tâches en cours, puis mettre à jour pour continuer à utiliser Soter.",
+    "gracePeriodCountdown": "Période de grâce restante : {time}",
+    "gracePeriodExpired": "La période de grâce a expiré. Mise à jour requise pour continuer.",
+    "dismiss": "Ignorer"
   },
   "submissionQueue": {
     "retries": "Nouvelles tentatives",

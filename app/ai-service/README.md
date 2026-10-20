@@ -92,6 +92,15 @@ result envelope. Requests without `stream=true` continue to return the normal
 single JSON envelope and use the existing response cache. Token events contain
 partial provider text; the final result event is authoritative.
 
+Successful verification attempts for the same `anchor_metadata.claim_id` (or
+the same evidence artifact IDs when no claim ID is supplied) are subject to
+`VERIFICATION_COOLDOWN_SECONDS` (default `300`). The cooldown is scoped to the
+organization, and repeat requests inside the interval reuse the prior result
+without another provider call. Such responses include
+`X-Verification-Cooldown: true`. Attempts after the interval may be processed
+again. Requests without a claim ID or artifact IDs do not have a stable
+identity to cooldown.
+
 Request body:
 
 ```json
@@ -127,7 +136,13 @@ Response body:
 curl -X POST "http://localhost:8000/ai/ocr" -F "image=@document.jpg"
 ```
 
-**Rate limit:** 10 requests/minute per IP
+**Rate limits:** OCR requests retain the per-IP `REQUEST_RATE_LIMIT` (default
+`10/minute`) and also use the shared per-key sliding-window budget
+`RATE_LIMIT_PER_KEY_DEFAULT` (default `60/minute`), with optional
+`RATE_LIMIT_ENDPOINT_OVERRIDES` by route. Batch OCR charges one per-key unit
+for each uploaded document, rather than one unit for the whole submission.
+For example, a four-document batch uses four units; if the remaining budget is
+too small, the request is rejected with HTTP 429 before any OCR jobs are queued.
 
 ### Request Safety Limits
 

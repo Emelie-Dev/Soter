@@ -6,7 +6,7 @@ import { LoggerService } from '../logger/logger.service';
 import { ONCHAIN_ADAPTER_TOKEN } from '../onchain/onchain.adapter';
 import { REDIS_CLIENT } from '../redis/redis.module';
 import { ProviderHealthRegistryService } from './provider-health-registry.service';
-import { OnchainCircuitBreakerService } from '../onchain/onchain-circuit-breaker.service';
+import { NotificationProviderHealthService } from '../notifications/notification-provider-health.service';
 
 describe('HealthService Diagnostics Export', () => {
   let service: HealthService;
@@ -53,15 +53,21 @@ describe('HealthService Diagnostics Export', () => {
           },
         },
         {
-          provide: OnchainCircuitBreakerService,
+          provide: NotificationProviderHealthService,
           useValue: {
-            getSnapshot: jest.fn().mockReturnValue({
-              state: 'closed',
-              failureCount: 0,
-              failureThreshold: 5,
-              failureWindowMs: 30000,
-              resetTimeoutMs: 30000,
-              retryAfterMs: 0,
+            checkProviders: jest.fn().mockResolvedValue({
+              email: {
+                provider: 'console',
+                reachable: true,
+                latencyMs: 0,
+                skipped: true,
+              },
+              sms: {
+                provider: 'console',
+                reachable: true,
+                latencyMs: 0,
+                skipped: true,
+              },
             }),
           },
         },
